@@ -1,30 +1,26 @@
 package esi.atlir5.mikolivator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
 public class Elevator {
     
-    private int nbPersonsMax;
-    private boolean isGoingUp;
-    private boolean isMoving;
+    private final int nbPersonsMax;
+    private int nbCurrentPersons;
+    private final int lastFloor;
+    private final int lowestFloor;
+    private MovementElevator movement;
     private int currentFloor;
-    private List<Integer> destinations;
-    private List<Person> passengers;
-    private Building building;
     
-    public Elevator (int nb_persons_max, int current_floor, Building b){
+    public Elevator (int nb_persons_max, int current_floor, int last_floor, 
+            int lowest_floor){
         nbPersonsMax = nb_persons_max;
         currentFloor = current_floor;
-        isGoingUp = false;
-        isMoving = false;
-        destinations = new ArrayList<>();
-        passengers = new ArrayList<>();
-        building = b;
+        lastFloor = last_floor;
+        lowestFloor = lowest_floor;
+        movement = MovementElevator.STANDBY;
+        nbCurrentPersons = 0;
     }
     
     //  getters
@@ -32,12 +28,16 @@ public class Elevator {
         return currentFloor;
     }
     
-    public boolean isGoingUp(){
-        return isGoingUp;
+    public MovementElevator getMovement(){
+        return movement;
     }
-    
-    public boolean isMoving(){
-        return isMoving;
+
+    int getLastFloor() {
+        return lastFloor;
+    }
+
+    int getLowestFloor() {
+        return lowestFloor;
     }
     
     //  setters
@@ -45,38 +45,19 @@ public class Elevator {
         currentFloor = floor;
     }
     
+    void setMovement (MovementElevator mv) {
+        movement = mv;
+    }
+    
     public boolean isFreePlace(){
-        return passengers.size() < nbPersonsMax;
+        return nbCurrentPersons < nbPersonsMax;
     }
     
-    public void addDestination (int floor){
-        destinations.add(floor);
+    void addOnePerson(){
+        ++nbCurrentPersons;
     }
     
-    public void addPassenger (){
-        while (isFreePlace() && 
-                (building.getNumberPersonWaitingAtFloor(currentFloor) != 0)){
-            if (isGoingUp) 
-                passengers.add(building.removeFirstPersonWaitingGoingUp(currentFloor));
-            else
-                passengers.add(building.removeFirstPersonWaitingGoingDown(currentFloor));
-        }
-    }
-    
-    public void releasePeople(){
-        for (int i=0; i<passengers.size(); ++i){
-            if (passengers.get(i).getGoalFloor() == currentFloor){
-                passengers.get(i).setCurrentFloor(currentFloor);
-                passengers.remove(i);
-            }
-        }
-    }
-    
-    public boolean isElevatorAtTheTop(){
-        return currentFloor == building.getNumberOfFloors();
-    }
-    
-    public boolean isElevatorAtTheBottom(){
-        return currentFloor == 0;
+    void releaseOnePerson(){
+        --nbCurrentPersons;
     }
 }

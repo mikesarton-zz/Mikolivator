@@ -9,35 +9,24 @@ import java.util.List;
  */
 public class Building {
 
-    private int numberFloors;
-    private Elevator elevator;
-    private List<Person> people;
-    private List<Person> waitingPeople;
+    private List<Passenger> people;
+    private List<Passenger> waitingPeople;
 
-    public Building(int number_floors, Elevator elevator, List<Person> people_list) {
-        numberFloors = number_floors;
-        this.elevator = elevator;
-        people = people_list;
+    public Building() {
+        people = new ArrayList<>();
         waitingPeople = new ArrayList<>();
     }
 
-    //  getters
-    public Elevator getElevator() {
-        return elevator;
-    }
-    
-    public List<Person> getPeople(){
+    //  getters    
+    public List<Passenger> getPeople(){
         return people;
     }
     
-    public int getNumberOfFloors(){
-        return numberFloors;
-    }
-    
-    public List<Person> getPeopleWaitingAtFloor (int floor){
-        List<Person> list = new ArrayList<>();
-        for (Person p : people){
-            if (p.getIsWaiting(floor)) list.add(p);
+    public List<Passenger> getPeopleWaitingAtFloor (int floor){
+        List<Passenger> list = new ArrayList<>();
+        for (int i=0; i<waitingPeople.size(); ++i) {
+            if (waitingPeople.get(i).getPosition().getFloor() == floor)
+                list.add(waitingPeople.get(i));
         }
         return list;
     }
@@ -48,47 +37,30 @@ public class Building {
     
     public int getNumberPersonWaitingInBuilding(){
         return waitingPeople.size();
-    }
+    }    
     
-//    public Person removeFirstPersonWaiting(int floor){
-//        List<Person> list = getPeopleWaitingAtFloor(floor);
-//        if (!list.isEmpty()) return list.remove(0);
-//        return null;
-//    }
-    
-    public Person removeFirstPersonWaitingGoingUp(int floor){
-        for (int i=0; i<waitingPeople.size(); ++i){
-            if ((waitingPeople.get(i).getCurrentFloor() == floor) 
-                    && waitingPeople.get(i).isGoingUp())
-                return waitingPeople.remove(i);
+    public Passenger removeFirstPersonWaitingGoingUp(int floor){
+        List <Passenger> list = getPeopleWaitingAtFloor(floor);
+        for (int i=0; i<list.size(); ++i){
+            if (list.get(i).isGoingUp()) return list.remove(i);
         }
         return null;
     }
     
     public Person removeFirstPersonWaitingGoingDown(int floor){
-        for (int i=0; i<waitingPeople.size(); ++i){
-            if ((waitingPeople.get(i).getCurrentFloor() == floor) 
-                    && !waitingPeople.get(i).isGoingUp())
-                return waitingPeople.remove(i);
+        List <Passenger> list = getPeopleWaitingAtFloor(floor);
+        for (int i=0; i<list.size(); ++i){
+            if (!list.get(i).isGoingUp()) return list.remove(i);
         }
         return null;
     }
     
     //  setters
-    public void setElevator(Elevator el){
-        elevator = el;
-    }
-    
-    public void addPerson (Person p) {
+    public void addPerson (Passenger p) {
         people.add(p);
     }
     
-    public Elevator findElevatorByFloor (int floor){
-        if (elevator.getCurrentFloor() == floor) return elevator;
-        return null;
-    }
-    
-    public void addPersonWaiting (Person p){
+    public void addPersonWaiting (Passenger p){
         waitingPeople.add(p);
     }
     
