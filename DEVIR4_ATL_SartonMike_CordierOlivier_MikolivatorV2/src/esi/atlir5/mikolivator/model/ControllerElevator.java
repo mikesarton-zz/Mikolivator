@@ -1,197 +1,65 @@
 package esi.atlir5.mikolivator.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
-public class ControllerElevator implements ElevatorBehavior {
+class ControllerElevator extends ElevatorBehavior {
 
-    private Elevator elevator;
-    private List<Integer> destinations;
-
-    public ControllerElevator(int nb_persons_max, int current_floor, int last_floor,
+    ControllerElevator(int nb_persons_max, int current_floor, int last_floor,
             int lowest_floor) {
-        elevator = new Elevator(nb_persons_max, current_floor, last_floor,
-                lowest_floor);
-        destinations = new ArrayList<>();
+        super(new Elevator(nb_persons_max, current_floor, last_floor,
+                lowest_floor));
     }
 
-    private void addDestination(int floor) throws MikolivatorException {
-        if (floor > elevator.getLastFloor() || floor < elevator.getLowestFloor())
-        {
-            throw new MikolivatorException("Etage inexistant");
-        }
-        destinations.add(floor);
-    }
-    
-    private void eraseDestination (int floor) {
-        if (!destinations.contains(floor)) return;
-        
-        for (int i=0; i<destinations.size(); ++i) {
-            if (destinations.get(i) == floor) destinations.remove(i);
-        }
-    }
-
-    private int getNextDestination(MovementElevator move) throws MikolivatorException {
-        for (int i = 0; i < destinations.size(); ++i) {
-            switch (move) {
-                case UP:
-                    if (destinations.get(i) > elevator.getCurrentFloor()) {
-                        return destinations.remove(i);
-                    }
-                case DOWN:
-                    if (destinations.get(i) < elevator.getCurrentFloor()) {
-                        return destinations.remove(i);
-                    }
-            }
-        }
-        throw new MikolivatorException("Aucun étage correspondant");
-    }
-
-    int getLastFloor() {
-        return elevator.getLastFloor();
-    }
-
-    int getLowestFloor() {
-        return elevator.getLowestFloor();
-    }
-
+    //  déplace l'ascenseur (reste à définir l'algo qu'on veut)
     @Override
-    public void move() {        
+    public void move() {
+        //  tant qu'il reste des destinations...
         while (!destinations.isEmpty()) {
-            if (destinations.get(0) > elevator.getCurrentFloor()) {
-                goingUp();
+            //  prendre la première qui a été entrée
+            int destination = destinations.remove(0);
+
+            //  monter ou descendre selon où l'ascenseur se situe
+            if (destination > elevator.getCurrentFloor()) {
+                goingUp(destination);
             } else {
-                goingDown();
+                goingDown(destination);
             }
-        }
-    }
 
-    @Override
-    public void goingUp() {
-        //  regarder si il existe des destinations
-        if (destinations.isEmpty()) return;
-        
-        int destination;
-        
-        //  récupérer la prochaine destination montante
-        try {
-            destination = getNextDestination(MovementElevator.UP);
-        } catch (MikolivatorException e) {
-            System.out.println(e.getMessage());
-            return;
+            //  afficher l'état
+            System.out.println(passengers.size() + " passagers restants.");
+            System.out.println(destinations.size() + " destinations restantes.");
         }
-
-        //  définir le nombre de temps que cela va durer
-        int sleepTime = destination - elevator.getCurrentFloor();
-        
-        elevator.setMovement(MovementElevator.UP);
-        System.out.println("--- L'ascenseur va monter. ---");
-        
-        //  instancier le timer permettant le mouvement de l'ascenseur
-        Timer t = new Timer();
-        
-        //  faire monter l'ascenseur
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (elevator.getCurrentFloor() + 1 == destination) cancel();
-                elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
-                System.out.println("Etage elevator: " + elevator.getCurrentFloor());
-            }
-        }, new Date(), 1000);
-        
-        //  bloquer le thread courant le temps que l'ascenseur monte
-        try {
-            Thread.sleep(sleepTime * 1000);
-            System.out.println("Ascenseur bloqué.");
-        } catch (InterruptedException ex) {
-            System.out.println("Erreur - ControllerElevator - goingUp(): " 
-                    + ex.getMessage());
-        }
-    }
-
-    @Override
-    public void goingDown() {
-        //  regarder si il existe des destinations
-        if (destinations.isEmpty()) return;
-        
-        int destination;
-        
-        //  récupérer la prochaine destination montante
-        try {
-            destination = getNextDestination(MovementElevator.UP);
-        } catch (MikolivatorException e) {
-            System.out.println(e.getMessage());
-            return;
-        }
-        
-        //  définir le temps que l'ascenseur va monter
-        int sleepTime = Math.abs(destination - elevator.getCurrentFloor());
-        
-        elevator.setMovement(MovementElevator.DOWN);
-        System.out.println("--- L'ascenseur va descendre. ---");
-        
-        //  instancier le timer permettant à l'ascenseur de monter
-        Timer t = new Timer();
-        
-        //  faire monter l'ascenseur
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (elevator.getCurrentFloor() - 1 == destination) cancel();
-                elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-                System.out.println("Etage elevator: " + elevator.getCurrentFloor());
-            }
-        }, new Date(), 1000);
-        
-        //  bloquer le thread courant le temps que l'ascenseur monte
-        try {
-            Thread.sleep(sleepTime * 1000);
-            System.out.println("Ascenseur bloqué.");
-        } catch (InterruptedException ex) {
-            System.out.println("Erreur - ControllerElevator - goingDown(): " 
-                    + ex.getMessage());
-        }        
-    }
-
-    @Override
-    public boolean addPassenger(Passenger p) {
-        if (!elevator.isFreePlace()) return false;        
-        try {
-            addDestination(p.getDestinationFloor());
-        } catch (MikolivatorException ex) {
-            System.out.println(ex.getMessage());
-            return false;
-        }
-        p.setInElevator(true);
-        p.getPosition().setPlace(11);
-        elevator.addOnePerson();
-        return true;
-    }
-
-    @Override
-    public void releasePassenger(Passenger p) {
-        p.setInElevator(false);
-        p.getPosition().setPlace(10);
-        elevator.releaseOnePerson();
     }
 
     public static void main(String[] args) {
-        Passenger p = new Passenger(3);
-        Passenger p2 = new Passenger (8);
-        Passenger p3 = new Passenger (1);
-        
-        ControllerElevator ce = new ControllerElevator(5, 0, 10, 0);
+
+        //  petit main pour créer différents cas de figure (tester en gros)
+        Passenger p = new Passenger(4);
+        Passenger p2 = new Passenger(6);
+        Passenger p3 = new Passenger(2);
+        Passenger p4 = new Passenger(6);
+        Passenger p5 = new Passenger(5);
+        Passenger p6 = new Passenger(9);
+        Passenger p7 = new Passenger(4);
+        Passenger p8 = new Passenger(3);
+        Passenger p9 = new Passenger(5);
+        Passenger p10 = new Passenger(15);
+        Passenger p11 = new Passenger(8);
+
+        ControllerElevator ce = new ControllerElevator(15, 0, 15, 0);
         ce.addPassenger(p);
         ce.addPassenger(p2);
         ce.addPassenger(p3);
+        ce.addPassenger(p4);
+        ce.addPassenger(p5);
+        ce.addPassenger(p6);
+        ce.addPassenger(p7);
+        ce.addPassenger(p8);
+        ce.addPassenger(p9);
+        ce.addPassenger(p10);
+        ce.addPassenger(p11);
         ce.move();
     }
 }
