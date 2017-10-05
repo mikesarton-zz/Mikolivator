@@ -9,5 +9,5 @@ public interface ElevatorBehavior {
     public void goingUp();
     public void goingDown();
     public boolean addPassenger(Passenger p);
-    public void releasePassenger();
+    public void releasePassenger(Passenger p);
 }

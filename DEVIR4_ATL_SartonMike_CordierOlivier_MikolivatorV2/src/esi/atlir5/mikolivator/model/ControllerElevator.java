@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -24,15 +22,23 @@ public class ControllerElevator implements ElevatorBehavior {
         destinations = new ArrayList<>();
     }
 
-    public void addDestination(int floor) throws MikolivatorException {
+    private void addDestination(int floor) throws MikolivatorException {
         if (floor > elevator.getLastFloor() || floor < elevator.getLowestFloor())
         {
             throw new MikolivatorException("Etage inexistant");
         }
         destinations.add(floor);
     }
+    
+    private void eraseDestination (int floor) {
+        if (!destinations.contains(floor)) return;
+        
+        for (int i=0; i<destinations.size(); ++i) {
+            if (destinations.get(i) == floor) destinations.remove(i);
+        }
+    }
 
-    int getNextDestination(MovementElevator move) throws MikolivatorException {
+    private int getNextDestination(MovementElevator move) throws MikolivatorException {
         for (int i = 0; i < destinations.size(); ++i) {
             switch (move) {
                 case UP:
@@ -57,14 +63,14 @@ public class ControllerElevator implements ElevatorBehavior {
     }
 
     @Override
-    public void move() {
-        System.out.println("L'ascenseur va bouger.");
-        goingUp();
-//        goingDown();
-        System.out.println("L'ascenseur est arrivé. -- move()");
-        //  la méthode bug car aucune destination n'est ajoutée dans "destinations".
-        //  il faut maintenant le faire proprement en ajoutant un passager avant de faire
-        //  bouger l'ascenseur.
+    public void move() {        
+        while (!destinations.isEmpty()) {
+            if (destinations.get(0) > elevator.getCurrentFloor()) {
+                goingUp();
+            } else {
+                goingDown();
+            }
+        }
     }
 
     @Override
@@ -86,6 +92,7 @@ public class ControllerElevator implements ElevatorBehavior {
         int sleepTime = destination - elevator.getCurrentFloor();
         
         elevator.setMovement(MovementElevator.UP);
+        System.out.println("--- L'ascenseur va monter. ---");
         
         //  instancier le timer permettant le mouvement de l'ascenseur
         Timer t = new Timer();
@@ -103,6 +110,7 @@ public class ControllerElevator implements ElevatorBehavior {
         //  bloquer le thread courant le temps que l'ascenseur monte
         try {
             Thread.sleep(sleepTime * 1000);
+            System.out.println("Ascenseur bloqué.");
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingUp(): " 
                     + ex.getMessage());
@@ -128,6 +136,7 @@ public class ControllerElevator implements ElevatorBehavior {
         int sleepTime = Math.abs(destination - elevator.getCurrentFloor());
         
         elevator.setMovement(MovementElevator.DOWN);
+        System.out.println("--- L'ascenseur va descendre. ---");
         
         //  instancier le timer permettant à l'ascenseur de monter
         Timer t = new Timer();
@@ -145,10 +154,11 @@ public class ControllerElevator implements ElevatorBehavior {
         //  bloquer le thread courant le temps que l'ascenseur monte
         try {
             Thread.sleep(sleepTime * 1000);
+            System.out.println("Ascenseur bloqué.");
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingDown(): " 
                     + ex.getMessage());
-        }
+        }        
     }
 
     @Override
@@ -162,19 +172,26 @@ public class ControllerElevator implements ElevatorBehavior {
         }
         p.setInElevator(true);
         p.getPosition().setPlace(11);
+        elevator.addOnePerson();
         return true;
     }
 
     @Override
-    public void releasePassenger() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void releasePassenger(Passenger p) {
+        p.setInElevator(false);
+        p.getPosition().setPlace(10);
+        elevator.releaseOnePerson();
     }
 
     public static void main(String[] args) {
-        Passenger p = new Passenger(7);
-        ControllerElevator ce = new ControllerElevator(5, 0, 6, 0);
-        if (ce.addPassenger(p)) {
-            ce.move();
-        }
+        Passenger p = new Passenger(3);
+        Passenger p2 = new Passenger (8);
+        Passenger p3 = new Passenger (1);
+        
+        ControllerElevator ce = new ControllerElevator(5, 0, 10, 0);
+        ce.addPassenger(p);
+        ce.addPassenger(p2);
+        ce.addPassenger(p3);
+        ce.move();
     }
 }
