@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,11 +24,15 @@ public class ControllerElevator implements ElevatorBehavior {
         destinations = new ArrayList<>();
     }
 
-    public void addDestination(int floor) {
+    public void addDestination(int floor) throws MikolivatorException {
+        if (floor > elevator.getLastFloor() || floor < elevator.getLowestFloor())
+        {
+            throw new MikolivatorException("Etage inexistant");
+        }
         destinations.add(floor);
     }
 
-    int getNextDestination(MovementElevator move) {
+    int getNextDestination(MovementElevator move) throws MikolivatorException {
         for (int i = 0; i < destinations.size(); ++i) {
             switch (move) {
                 case UP:
@@ -39,7 +45,7 @@ public class ControllerElevator implements ElevatorBehavior {
                     }
             }
         }
-        return 0;
+        throw new MikolivatorException("Aucun étage correspondant");
     }
 
     int getLastFloor() {
@@ -52,7 +58,7 @@ public class ControllerElevator implements ElevatorBehavior {
 
     @Override
     public void move() {
-        System.out.println("L'ascenseur va descendre.");
+        System.out.println("L'ascenseur va bouger.");
         goingUp();
 //        goingDown();
         System.out.println("L'ascenseur est arrivé. -- move()");
@@ -63,11 +69,28 @@ public class ControllerElevator implements ElevatorBehavior {
 
     @Override
     public void goingUp() {
-        int destination = getNextDestination(MovementElevator.UP);
-//        int destination = 10;
+        //  regarder si il existe des destinations
+        if (destinations.isEmpty()) return;
+        
+        int destination;
+        
+        //  récupérer la prochaine destination montante
+        try {
+            destination = getNextDestination(MovementElevator.UP);
+        } catch (MikolivatorException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        //  définir le nombre de temps que cela va durer
         int sleepTime = destination - elevator.getCurrentFloor();
+        
         elevator.setMovement(MovementElevator.UP);
+        
+        //  instancier le timer permettant le mouvement de l'ascenseur
         Timer t = new Timer();
+        
+        //  faire monter l'ascenseur
         t.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -76,19 +99,40 @@ public class ControllerElevator implements ElevatorBehavior {
                 System.out.println("Etage elevator: " + elevator.getCurrentFloor());
             }
         }, new Date(), 1000);
+        
+        //  bloquer le thread courant le temps que l'ascenseur monte
         try {
             Thread.sleep(sleepTime * 1000);
         } catch (InterruptedException ex) {
-            System.out.println("Erreur - ControllerElevator - goingUp(): " + ex.getMessage());
+            System.out.println("Erreur - ControllerElevator - goingUp(): " 
+                    + ex.getMessage());
         }
     }
 
     @Override
     public void goingDown() {
-        int destination = getNextDestination(MovementElevator.DOWN);
+        //  regarder si il existe des destinations
+        if (destinations.isEmpty()) return;
+        
+        int destination;
+        
+        //  récupérer la prochaine destination montante
+        try {
+            destination = getNextDestination(MovementElevator.UP);
+        } catch (MikolivatorException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        
+        //  définir le temps que l'ascenseur va monter
         int sleepTime = Math.abs(destination - elevator.getCurrentFloor());
+        
         elevator.setMovement(MovementElevator.DOWN);
+        
+        //  instancier le timer permettant à l'ascenseur de monter
         Timer t = new Timer();
+        
+        //  faire monter l'ascenseur
         t.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -97,19 +141,27 @@ public class ControllerElevator implements ElevatorBehavior {
                 System.out.println("Etage elevator: " + elevator.getCurrentFloor());
             }
         }, new Date(), 1000);
+        
+        //  bloquer le thread courant le temps que l'ascenseur monte
         try {
             Thread.sleep(sleepTime * 1000);
         } catch (InterruptedException ex) {
-            System.out.println("Erreur - ControllerElevator - goingDown(): " + ex.getMessage());
+            System.out.println("Erreur - ControllerElevator - goingDown(): " 
+                    + ex.getMessage());
         }
     }
 
     @Override
     public boolean addPassenger(Passenger p) {
-        if (!elevator.isFreePlace()) return false;
+        if (!elevator.isFreePlace()) return false;        
+        try {
+            addDestination(p.getDestinationFloor());
+        } catch (MikolivatorException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
         p.setInElevator(true);
         p.getPosition().setPlace(11);
-        addDestination(p.getDestinationFloor());
         return true;
     }
 
@@ -119,7 +171,10 @@ public class ControllerElevator implements ElevatorBehavior {
     }
 
     public static void main(String[] args) {
+        Passenger p = new Passenger(7);
         ControllerElevator ce = new ControllerElevator(5, 0, 6, 0);
-        ce.move();
+        if (ce.addPassenger(p)) {
+            ce.move();
+        }
     }
 }
