@@ -1,44 +1,50 @@
 package esi.atlir5.mikolivator.model;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
-public class Passenger extends Person {
-    private int destinationFloor;
-    private Position position;
-    private boolean isInElevator;
+class Passenger extends PassengerBehavior implements Runnable{
     
-    public Passenger (int destination) {
-        destinationFloor = destination;
-        position = new Position();
+    
+    Passenger (int destination, List<Integer> elevators_positions) {
+        super (destination, elevators_positions);
     }
 
-    public int getDestinationFloor() {
-        return destinationFloor;
+    @Override
+    void walk() {
+        switch (movement) {
+            case TOELEVATOR : position.setPlace(position.getPlace() + 1);
+                break;
+            case TOCORRIDOR : position.setPlace(position.getPlace() - 1);
+                break;
+        }
+        
+        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
+        
+        try {
+            callElevator();
+        } catch (MikolivatorException e) {
+//            System.out.println(e.getMessage());
+        }
     }
 
-    public void setDestinationFloor(int destinationFloor) {
-        this.destinationFloor = destinationFloor;
+    @Override
+    public void run() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!isInElevator && !isWaiting) {
+                    walk();
+                }
+            }
+        }, new Date(), 1000);
     }
 
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
     
-    boolean isGoingUp(){
-        return destinationFloor > position.getFloor();
-    }
-    
-    boolean isInElevator() {
-        return isInElevator;
-    }
-    
-    void setInElevator(boolean b) {
-        isInElevator = b;
-    }
 }

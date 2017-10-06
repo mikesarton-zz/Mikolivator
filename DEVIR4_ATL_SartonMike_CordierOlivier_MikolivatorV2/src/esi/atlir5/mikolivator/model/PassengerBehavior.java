@@ -1,18 +1,96 @@
 package esi.atlir5.mikolivator.model;
 
+import java.util.List;
+
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
-interface PassengerBehavior {
+abstract class PassengerBehavior {
+    
+    private int destinationFloor;
+    Position position;
+    boolean isInElevator;
+    boolean isWaiting;
+    MovementPassenger movement;
+    private final List<Integer> elevatorsPositions;
 
-    void walk();
+    PassengerBehavior(int destination, List<Integer> elevators_positions) {
+        destinationFloor = destination;
+        position = new Position();
+        isInElevator = false;
+        isWaiting = false;
+        elevatorsPositions = elevators_positions;
+        movement = MovementPassenger.TOELEVATOR;
+    }        
+    
+    int getDestinationFloor() {
+        return destinationFloor;
+    }
 
-    void callElevator();
+    void setDestinationFloor(int destinationFloor) {
+        this.destinationFloor = destinationFloor;
+    }
 
-    void enterElevator();
+    public MovementPassenger getMovement() {
+        return movement;
+    }
 
-    void leaveElevator();
+    public void setMovement(MovementPassenger movement) {
+        this.movement = movement;
+    }        
 
-    void makeUTurn();
+    Position getPosition() {
+        return position;
+    }
+
+    void setPosition(Position position) {
+        this.position = position;
+    }
+        
+    boolean isGoingUp(){
+        return destinationFloor > position.getFloor();
+    }
+    
+    boolean isWaiting() {
+        return isWaiting;
+    }
+    
+    boolean isInElevator() {
+        return isInElevator;
+    }    
+
+    void callElevator() throws MikolivatorException {
+        boolean wellPlaced = false;
+        int index = 0;
+        while (index<elevatorsPositions.size() && !wellPlaced) {
+            wellPlaced = position.getPlace() == (elevatorsPositions.get(index) - 1);
+            ++index;
+        }
+        if (!wellPlaced) {
+            throw new MikolivatorException("Impossible d'appeler l'ascenseur "
+                + "si on est pas devant.");
+        } else {
+            System.out.println("Le passager attend l'ascenseur.");
+        }
+        
+        isWaiting = true;
+    }
+
+    void enterElevator(int placeElevator) {
+        position.setPlace(placeElevator);
+        isInElevator = true;
+    }
+
+    void leaveElevator(int placeElevator) {
+        position.setPlace(placeElevator);
+        isInElevator = false;
+        movement = MovementPassenger.TOCORRIDOR;
+    }
+
+    void makeUTurn() {
+        
+    }
+    
+    abstract void walk();
 }

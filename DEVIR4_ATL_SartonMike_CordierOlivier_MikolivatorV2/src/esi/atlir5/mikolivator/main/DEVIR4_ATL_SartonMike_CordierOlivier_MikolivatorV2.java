@@ -5,6 +5,7 @@
  */
 package esi.atlir5.mikolivator.main;
 
+import esi.atlir5.mikolivator.view.PrintState;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,7 +32,7 @@ public class DEVIR4_ATL_SartonMike_CordierOlivier_MikolivatorV2 extends Applicat
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        launch(args);
+        PrintState ps = new PrintState();
     }
     
 }

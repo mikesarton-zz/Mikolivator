@@ -7,22 +7,24 @@ import java.util.List;
  *
  * @author Mike Sarton & Olivier Cordier
  */
-public class Building {
+class Building {
 
     private List<Passenger> people;
     private List<Passenger> waitingPeople;
+    private final int nbPersonsMax;
 
-    public Building() {
+    Building(int nb_persons_max_in_building) {
         people = new ArrayList<>();
         waitingPeople = new ArrayList<>();
+        nbPersonsMax = nb_persons_max_in_building;
     }
 
     //  getters    
-    public List<Passenger> getPeople(){
+    List<Passenger> getPeople(){
         return people;
     }
     
-    public List<Passenger> getPeopleWaitingAtFloor (int floor){
+    List<Passenger> getPeopleWaitingAtFloor (int floor){
         List<Passenger> list = new ArrayList<>();
         for (int i=0; i<waitingPeople.size(); ++i) {
             if (waitingPeople.get(i).getPosition().getFloor() == floor)
@@ -31,15 +33,15 @@ public class Building {
         return list;
     }
     
-    public int getNumberPersonWaitingAtFloor (int floor){
+    int getNumberPersonWaitingAtFloor (int floor){
         return getPeopleWaitingAtFloor(floor).size();
     }
     
-    public int getNumberPersonWaitingInBuilding(){
+    int getNumberPersonWaitingInBuilding(){
         return waitingPeople.size();
     }    
     
-    public Passenger removeFirstPersonWaitingGoingUp(int floor){
+    Passenger removeFirstPersonWaitingGoingUp(int floor){
         List <Passenger> list = getPeopleWaitingAtFloor(floor);
         for (int i=0; i<list.size(); ++i){
             if (list.get(i).isGoingUp()) return list.remove(i);
@@ -47,7 +49,7 @@ public class Building {
         return null;
     }
     
-    public Person removeFirstPersonWaitingGoingDown(int floor){
+    Passenger removeFirstPersonWaitingGoingDown(int floor){
         List <Passenger> list = getPeopleWaitingAtFloor(floor);
         for (int i=0; i<list.size(); ++i){
             if (!list.get(i).isGoingUp()) return list.remove(i);
@@ -56,13 +58,12 @@ public class Building {
     }
     
     //  setters
-    public void addPerson (Passenger p) {
+    void addPerson (Passenger p) {
+        if (people.size() == nbPersonsMax) return;
         people.add(p);
     }
     
-    public void addPersonWaiting (Passenger p){
+    void addPersonWaiting (Passenger p){
         waitingPeople.add(p);
     }
-    
-    
 }
