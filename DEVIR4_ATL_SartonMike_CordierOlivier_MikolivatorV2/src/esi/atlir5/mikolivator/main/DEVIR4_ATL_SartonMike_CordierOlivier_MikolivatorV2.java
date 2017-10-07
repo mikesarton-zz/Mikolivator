@@ -20,12 +20,12 @@ public class DEVIR4_ATL_SartonMike_CordierOlivier_MikolivatorV2 extends Applicat
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
-        
-        Scene scene = new Scene(root);
-        
-        stage.setScene(scene);
-        stage.show();
+//        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+//        
+//        Scene scene = new Scene(root);
+//        
+//        stage.setScene(scene);
+//        stage.show();
     }
 
     /**

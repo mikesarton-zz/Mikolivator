@@ -1,5 +1,7 @@
 package esi.atlir5.mikolivator.model;
 
+import esi.atlir5.mikolivator.observers.Observable;
+import esi.atlir5.mikolivator.observers.Observer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,11 +12,12 @@ import java.util.TimerTask;
  *
  * @author Mike Sarton & Olivier Cordier
  */
-abstract class ElevatorBehavior {
+abstract class ElevatorBehavior implements Observable {
 
     final Elevator elevator;
     List<Integer> destinations;
     List<Passenger> passengers;
+    final List<Observer> observers;
     final int elevatorPosition;
 
     ElevatorBehavior(Elevator elevator, int elevator_position) {
@@ -22,6 +25,7 @@ abstract class ElevatorBehavior {
         destinations = new ArrayList<>();
         passengers = new ArrayList<>();
         elevatorPosition = elevator_position;
+        observers = new ArrayList<>();
     }
 
     //  ajoute une destination en vérifiant qu'elle n'est pas déjà présente
@@ -68,7 +72,8 @@ abstract class ElevatorBehavior {
                     cancel();
                 }
                 elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
-                System.out.println("Etage courant: " + getCurrentFloor());
+//                System.out.println("Etage courant: " + getCurrentFloor());
+                notifyObs(101);
             }
         }, new Date(), 1000);
 
@@ -101,7 +106,8 @@ abstract class ElevatorBehavior {
                     cancel();
                 }
                 elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-                System.out.println("Etage courant: " + getCurrentFloor());
+//                System.out.println("Etage courant: " + getCurrentFloor());
+                notifyObs(101);
             }
         }, new Date(), 1000);
 
@@ -130,6 +136,7 @@ abstract class ElevatorBehavior {
 //            System.out.println(ex.getMessage());
 //            return false;
 //        }
+        notifyObs(101);
         return true;    //  retourne vrai si la personne a bien été ajoutée.
     }
 
@@ -150,8 +157,14 @@ abstract class ElevatorBehavior {
             }
         }
 
-        System.out.println(cpt + " personnes sont sorties de l'ascenseur.");
+//        System.out.println(cpt + " personnes sont sorties de l'ascenseur.");
+        notifyObs(101);
+        notifyObs(floor);
         return cpt;
+    }
+    
+    int getNumberOfPassengersInElevator() {
+        return passengers.size();
     }
 
     abstract void move();

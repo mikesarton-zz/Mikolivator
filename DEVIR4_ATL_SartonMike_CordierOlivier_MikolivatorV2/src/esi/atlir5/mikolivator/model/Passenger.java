@@ -1,5 +1,6 @@
 package esi.atlir5.mikolivator.model;
 
+import esi.atlir5.mikolivator.observers.Observer;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -29,11 +30,14 @@ class Passenger extends PassengerBehavior implements Runnable {
             case TOCORRIDOR:
                 if (isHidden) return;
                 position.setPlace(position.getPlace() - 1);
-                isHidden = position.getPlace() == -1;
+                if(position.getPlace() == -1) {
+                    isHidden = true;
+                    notifyObs(position.getFloor());
+                }
                 break;
         }
 
-        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
+//        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
     }
 
     @Override
@@ -46,6 +50,27 @@ class Passenger extends PassengerBehavior implements Runnable {
                 }
             }
         }, new Date(), 1000);
+    }
+
+    @Override
+    public void addObserver(Observer obs) {
+        if (!observers.contains(obs)) {
+            observers.add(obs);
+        }
+    }
+
+    @Override
+    public void deleteObserver(Observer obs) {
+        if (observers.contains(obs)) {
+            observers.remove(obs);
+        }
+    }
+
+    @Override
+    public void notifyObs(int view) {
+        observers.forEach((obs) -> {
+            obs.update(view);
+        });
     }
 
 }

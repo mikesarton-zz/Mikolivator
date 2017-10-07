@@ -1,24 +1,27 @@
 package esi.atlir5.mikolivator.model;
 
+import esi.atlir5.mikolivator.observers.Observer;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
 class ControllerElevator extends ElevatorBehavior implements Runnable {
     
-    boolean isRunning;
+//    private final List<Observer> observers;
 
     ControllerElevator(int nb_persons_max, int current_floor, int last_floor,
             int lowest_floor, int elevator_position) {
         super(new Elevator(nb_persons_max, current_floor, last_floor,
                 lowest_floor), elevator_position);
-        
-        isRunning = true;
+//        observers = new ArrayList<>();
     }
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (true) {
             move();            
         }
     }
@@ -28,20 +31,22 @@ class ControllerElevator extends ElevatorBehavior implements Runnable {
     public void move() {
         //  tant qu'il reste des destinations...
         while (!destinations.isEmpty()) {
-            System.out.println("Départ de l'ascenseur...");
+//            System.out.println("Départ de l'ascenseur...");
             //  prendre la première qui a été entrée
             int destination = destinations.remove(0);
 
             //  monter ou descendre selon où l'ascenseur se situe
             if (destination > elevator.getCurrentFloor()) {
                 goingUp(destination);
+                notifyObs(104);
             } else {
                 goingDown(destination);
+                notifyObs(104);
             }
 
             //  afficher l'état
-            System.out.println(passengers.size() + " passagers restants.");
-            System.out.println(destinations.size() + " destinations restantes.");
+//            System.out.println(passengers.size() + " passagers restants.");
+//            System.out.println(destinations.size() + " destinations restantes.");
         }
     }
     
@@ -73,5 +78,26 @@ class ControllerElevator extends ElevatorBehavior implements Runnable {
 //        ce.addPassenger(p10);
 //        ce.addPassenger(p11);
 //        ce.move();
+    }
+
+    @Override
+    public void addObserver(Observer obs) {
+        if (!observers.contains(obs)) {
+            observers.add(obs);
+        }
+    }
+
+    @Override
+    public void deleteObserver(Observer obs) {
+        if (observers.contains(obs)) {
+            observers.remove(obs);
+        }
+    }
+
+    @Override
+    public void notifyObs(int view) {
+        observers.forEach((obs) -> {
+            obs.update(view);
+        });
     }
 }

@@ -1,12 +1,15 @@
 package esi.atlir5.mikolivator.model;
 
+import esi.atlir5.mikolivator.observers.Observable;
+import esi.atlir5.mikolivator.observers.Observer;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
-abstract class PassengerBehavior {
+abstract class PassengerBehavior implements Observable {
     
     private int destinationFloor;
     Position position;
@@ -15,6 +18,7 @@ abstract class PassengerBehavior {
     boolean isHidden;
     MovementPassenger movement;
     private final List<Integer> elevatorsPositions;
+    final List<Observer> observers;
 
     PassengerBehavior(int destination, List<Integer> elevators_positions) {
         destinationFloor = destination;
@@ -23,6 +27,7 @@ abstract class PassengerBehavior {
         isWaiting = false;
         elevatorsPositions = elevators_positions;
         movement = MovementPassenger.TOELEVATOR;
+        observers = new ArrayList<>();
     }        
     
     int getDestinationFloor() {
