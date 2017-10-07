@@ -1,24 +1,28 @@
 package esi.atlir5.mikolivator.model;
 
 import esi.atlir5.mikolivator.observers.Observer;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author Mike Sarton & Olivier Cordier
  */
-class ControllerElevator extends ElevatorBehavior implements Runnable {
-    
-//    private final List<Observer> observers;
+class ControllerElevator extends ElevatorBehavior implements Runnable {    
 
+    //  constructeur, reçoit:
+    //  1) le nombre de personne maximum dans l'ascenseur
+    //  2) l'étage courant de l'ascenseur (où l'initialiser)
+    //  3) le numéro d'étage le plus haut
+    //  4) le numéro d'étage le plus bas
+    //  5) la position de l'ascenseur (place)
+    //  crée un ascenseur et l'envoit au constructeur parent
     ControllerElevator(int nb_persons_max, int current_floor, int last_floor,
             int lowest_floor, int elevator_position) {
+        
         super(new Elevator(nb_persons_max, current_floor, last_floor,
                 lowest_floor), elevator_position);
-//        observers = new ArrayList<>();
     }
 
+    //  contenu du thread de l'ascenseur
     @Override
     public void run() {
         while (true) {
@@ -26,60 +30,23 @@ class ControllerElevator extends ElevatorBehavior implements Runnable {
         }
     }
     
-    //  déplace l'ascenseur (reste à définir l'algo qu'on veut)
+    //  déplacer l'ascenseur (reste à définir l'algo qu'on veut)
     @Override
-    public void move() {
-        //  tant qu'il reste des destinations...
-        while (!destinations.isEmpty()) {
-//            System.out.println("Départ de l'ascenseur...");
-            //  prendre la première qui a été entrée
-            int destination = destinations.remove(0);
-
-            //  monter ou descendre selon où l'ascenseur se situe
-            if (destination > elevator.getCurrentFloor()) {
-                goingUp(destination);
-                notifyObs(104);
+    public void move() {        
+        while (!destinations.isEmpty()) {   //  tant qu'il reste des destinations...
+            int destination = destinations.remove(0);   //  prendre la première destination qui a été entrée
+            
+            if (destination > elevator.getCurrentFloor()) { //  monter ou descendre selon où l'ascenseur se situe
+                goingUp(destination);   //  monter l'ascenseur jusqu'à la destination "destination"
+                notifyObs(104); //  notifier un changement au niveau du bâtiment
             } else {
-                goingDown(destination);
-                notifyObs(104);
+                goingDown(destination); //  descendre l'ascenseur jusqu'à la destination "destination"
+                notifyObs(104); //  notifier un changement au niveau du bâtiment
             }
-
-            //  afficher l'état
-//            System.out.println(passengers.size() + " passagers restants.");
-//            System.out.println(destinations.size() + " destinations restantes.");
         }
     }
-    
-    public static void main(String[] args) {
 
-        //  petit main pour créer différents cas de figure (tester en gros)
-//        Passenger p = new Passenger(4);
-//        Passenger p2 = new Passenger(6);
-//        Passenger p3 = new Passenger(2);
-//        Passenger p4 = new Passenger(6);
-//        Passenger p5 = new Passenger(5);
-//        Passenger p6 = new Passenger(9);
-//        Passenger p7 = new Passenger(4);
-//        Passenger p8 = new Passenger(3);
-//        Passenger p9 = new Passenger(5);
-//        Passenger p10 = new Passenger(15);
-//        Passenger p11 = new Passenger(8);
-//
-//        ControllerElevator ce = new ControllerElevator(15, 0, 15, 0);
-//        ce.addPassenger(p);
-//        ce.addPassenger(p2);
-//        ce.addPassenger(p3);
-//        ce.addPassenger(p4);
-//        ce.addPassenger(p5);
-//        ce.addPassenger(p6);
-//        ce.addPassenger(p7);
-//        ce.addPassenger(p8);
-//        ce.addPassenger(p9);
-//        ce.addPassenger(p10);
-//        ce.addPassenger(p11);
-//        ce.move();
-    }
-
+    //  ----------------------- METHODES POUR LES OBSERVEURS
     @Override
     public void addObserver(Observer obs) {
         if (!observers.contains(obs)) {

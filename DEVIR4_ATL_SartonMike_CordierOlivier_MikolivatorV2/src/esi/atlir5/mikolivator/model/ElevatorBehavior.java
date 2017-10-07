@@ -14,74 +14,70 @@ import java.util.TimerTask;
  */
 abstract class ElevatorBehavior implements Observable {
 
-    final Elevator elevator;
-    List<Integer> destinations;
-    List<Passenger> passengers;
-    final List<Observer> observers;
-    final int elevatorPosition;
+    final Elevator elevator;    //  l'ascenseur sur lequel porte les actions
+    List<Integer> destinations; //  liste des destinations de l'ascenseur
+    List<Passenger> passengers; //  liste des passagers de l'ascenseur
+    final List<Observer> observers; 
+    final int elevatorPosition; //  position de l'ascenseur dans le bâtiment
 
+    //  constructeur
     ElevatorBehavior(Elevator elevator, int elevator_position) {
         this.elevator = elevator;
+        elevatorPosition = elevator_position;
         destinations = new ArrayList<>();
         passengers = new ArrayList<>();
-        elevatorPosition = elevator_position;
         observers = new ArrayList<>();
     }
 
-    //  ajoute une destination en vérifiant qu'elle n'est pas déjà présente
+    //  ajouter une destination à l'ascenseur
     void addDestination(int floor) {
-        if (destinations.contains(floor) || elevator.getCurrentFloor() == floor) {
+        if (destinations.contains(floor) || elevator.getCurrentFloor() == floor) {  //  vérifie qu'elle n'est pas déjà présente OU étage courant de l'ascenseur
             return;
         }
         destinations.add(floor);
     }
 
-    //  retourne le dernier étage du bâtiment
+    //  retourner le dernier étage du bâtiment
     int getLastFloor() {
         return elevator.getLastFloor();
     }
 
-    //  retourne l'étage le plus bas du bâtiment
+    //  retourner l'étage le plus bas du bâtiment
     int getLowestFloor() {
         return elevator.getLowestFloor();
     }
     
+    //  retourner l'étage courant de l'ascenseur
     int getCurrentFloor() {
         return elevator.getCurrentFloor();
     }
     
+    //  retourner le mouvement de l'ascenseur
     MovementElevator getMovement() {
         return elevator.getMovement();
     }
 
     //  monter l'ascenseur jusqu'à la destination
-    void goingUp(int destination) {
-        //  définir le nombre de secondes que cela va durer
-        int sleepTime = destination - elevator.getCurrentFloor();
-
-        elevator.setMovement(MovementElevator.UP);
-
-        //  instancier le timer permettant le mouvement de l'ascenseur
-        Timer t = new Timer();
-
-        //  faire monter l'ascenseur
-        t.schedule(new TimerTask() {
+    void goingUp(int destination) {        
+        int sleepTime = destination - elevator.getCurrentFloor();   //  définir le nombre de secondes que cela va durer
+        elevator.setMovement(MovementElevator.UP);  //  changer le mouvement de l'ascenseur       
+        
+        Timer t = new Timer();  //  instancier le timer permettant le mouvement de l'ascenseur        
+        t.schedule(new TimerTask() {    //  faire monter l'ascenseur
             @Override
             public void run() {
-                if (elevator.getCurrentFloor() + 1 == destination) {
+                if (elevator.getCurrentFloor() + 1 == destination) {    //  vérifier qu'il n'a pas atteint la destination
                     cancel();
                 }
-                elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
-//                System.out.println("Etage courant: " + getCurrentFloor());
-                notifyObs(101);
+                elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);   //  modifier l'étage courant de l'ascenseur
+                notifyObs(101); //  notifier un changement au niveau de l'ascenseur 1
             }
         }, new Date(), 1000);
-
-        //  bloquer le thread courant le temps que l'ascenseur monte
-        try {
+        
+        try { //  bloquer le thread courant le temps que l'ascenseur monte
             Thread.sleep(sleepTime * 1000);
-            elevator.setMovement(MovementElevator.STANDBY);
-            int nb = releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
+            elevator.setMovement(MovementElevator.STANDBY); //  changer le mouvement de l'ascenseur (il est à l'arrêt)
+            releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingUp(): "
                     + ex.getMessage());
@@ -89,33 +85,27 @@ abstract class ElevatorBehavior implements Observable {
     }
 
     //  descendre l'ascenseur jusqu'à la destination
-    void goingDown(int destination) {
-        //  définir le temps que l'ascenseur va descendre
-        int sleepTime = Math.abs(destination - elevator.getCurrentFloor());
-
-        elevator.setMovement(MovementElevator.DOWN);
-
-        //  instancier le timer permettant à l'ascenseur de monter
-        Timer t = new Timer();
-
-        //  faire monter l'ascenseur
-        t.schedule(new TimerTask() {
+    void goingDown(int destination) {        
+        int sleepTime = Math.abs(destination - elevator.getCurrentFloor()); //  définir le temps que l'ascenseur va descendre
+        elevator.setMovement(MovementElevator.DOWN);    //  changer le mouvement de l'ascenseur
+        
+        Timer t = new Timer();  //  instancier le timer permettant à l'ascenseur de descendre
+        
+        t.schedule(new TimerTask() {    //  faire descendre l'ascenseur
             @Override
             public void run() {
-                if (elevator.getCurrentFloor() - 1 == destination) {
+                if (elevator.getCurrentFloor() - 1 == destination) {    //  vérifier que l'ascenseur n'a pas atteint sa destination
                     cancel();
                 }
-                elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-//                System.out.println("Etage courant: " + getCurrentFloor());
-                notifyObs(101);
+                elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);   //  modifier l'étage courant de l'ascenseur
+                notifyObs(101); //  notifier un changement au niveau de l'ascenseur 1
             }
         }, new Date(), 1000);
-
-        //  bloquer le thread courant le temps que l'ascenseur descend
-        try {
+        
+        try {   //  bloquer le thread courant le temps que l'ascenseur descend
             Thread.sleep(sleepTime * 1000);
-            elevator.setMovement(MovementElevator.STANDBY);
-            int nb = releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
+            elevator.setMovement(MovementElevator.STANDBY); //  modifier le mouvement de l'ascenseur
+            releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingDown(): "
                     + ex.getMessage());
@@ -127,42 +117,35 @@ abstract class ElevatorBehavior implements Observable {
         if (!elevator.isFreePlace()) { //  vérifie s'il reste de la place
             return false;
         }
-//        try {
-            addDestination(p.getDestinationFloor());    //  ajoute la destinationr
-            p.enterElevator(elevatorPosition);    //  faire entrer le passager dans l'ascenseur et le positionner dans l'ascenseur
-            passengers.add(p);  //  ajoute la personne à la liste des passagers
-            elevator.addOnePerson();    //  augmente le nombre de personnes dans l'ascenseur
-//        } catch (MikolivatorException ex) {
-//            System.out.println(ex.getMessage());
-//            return false;
-//        }
-        notifyObs(101);
+        addDestination(p.getDestinationFloor());    //  ajouter la destination du passager à l'ascenseur
+        p.enterElevator(elevatorPosition);    //  faire entrer le passager dans l'ascenseur et le positionner dans l'ascenseur
+        passengers.add(p);  //  ajouter la personne à la liste des passagers
+        elevator.addOnePerson();    //  augmenter le nombre de personnes dans l'ascenseur
+
+        notifyObs(101); //  notifier un changement au niveau de l'ascenseur 1
         return true;    //  retourne vrai si la personne a bien été ajoutée.
     }
 
     //  retire un passager de l'ascenseur
-    int releasePassenger(int floor) {
-        int cpt = 0;
-        int index = 0;
+    void releasePassenger(int floor) {
+        int index = 0;  //  positionnement dans la liste des passagers de l'ascenseur
 
         while (index < passengers.size()) { //  parcourir tous les passagers
             if (passengers.get(index).getDestinationFloor() == floor) { //  si il descend à cet étage
-                passengers.get(index).leaveElevator(elevatorPosition - 1);   //  le positionner hors de l'ascenseur
+                passengers.get(index).leaveElevator(elevatorPosition - 1);   //  le sortir de l'ascenseur et le positionner hors de l'ascenseur
                 passengers.remove(index);   //  le supprimer de la liste des passagers
-                elevator.releaseOnePerson();    //  diminue le nombre de personnes dans l'ascenseur
-                index = 0;    //  recommencer au début de la liste de passager
-                ++cpt;  //  incrémenter le nombre de passagers libérés
+                elevator.releaseOnePerson();    //  diminuer le nombre de personnes dans l'ascenseur
+                index = 0;    //  recommencer au début de la liste des passagers
             } else {
                 ++index;   //   passer à la personne suivante
             }
         }
-
-//        System.out.println(cpt + " personnes sont sorties de l'ascenseur.");
-        notifyObs(101);
-        notifyObs(floor);
-        return cpt;
+        
+        notifyObs(101); //  notifier un changement au niveau de l'ascenseur 1
+        notifyObs(floor);   //  notifier un changement au niveau de l'étage "floor"
     }
     
+    //  retourner le nombre de passagers dans l'ascenseur
     int getNumberOfPassengersInElevator() {
         return passengers.size();
     }

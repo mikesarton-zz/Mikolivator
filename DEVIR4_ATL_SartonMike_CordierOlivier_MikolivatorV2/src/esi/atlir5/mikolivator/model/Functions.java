@@ -1,12 +1,11 @@
 package esi.atlir5.mikolivator.model;
 
-import java.util.Date;
-import java.util.TimerTask;
-
 /**
  *
- * @author mike
+ * @author Mike Sarton & Olivier Cordier
  */
+
+//  Rassemblement de fonctions utiles...
 class Functions {
 
     public static void main(String[] args) {

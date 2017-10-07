@@ -5,8 +5,8 @@ package esi.atlir5.mikolivator.model;
  * @author Mike Sarton & Olivier Cordier
  */
 public class Position {
-    private int place;
-    private int floor;
+    private int place;  //  position au niveau de l'étage
+    private int floor;  //  étage courant d'une personne
     
     public Position () {
         place = 0;

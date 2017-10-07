@@ -33,8 +33,7 @@ public class PrintState implements Observer {
                 printFloor(view);
                 break;
             case 101:
-//                System.out.println("Update ascenseur 1.");
-//                printElevator();
+                printElevator();
                 break;
             case 102:
                 System.out.println("Update ascenseur 2.");
@@ -43,8 +42,7 @@ public class PrintState implements Observer {
                 System.out.println("Update ascenseur 3.");
                 break;
             case 104:
-//                System.out.println("Update building.");
-//                printBuilding();
+                printBuilding();
                 break;
         }
     }

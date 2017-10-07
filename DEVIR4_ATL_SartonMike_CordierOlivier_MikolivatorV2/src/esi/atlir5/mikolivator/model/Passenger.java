@@ -12,46 +12,50 @@ import java.util.TimerTask;
  */
 class Passenger extends PassengerBehavior implements Runnable {
 
+    //  constructeur, reçoit:
+    //  1)  la destination à atteindre
+    //  2)  la liste des positions des différents ascenseurs (s'il y en a plusieurs)
     Passenger(int destination, List<Integer> elevators_positions) {
-        super(destination, elevators_positions);
+        super(destination, elevators_positions);    //  envoyer ces paramètres au constructeur du parent
     }
 
+    //  faire marcher la personne en fonction de son sens
+    //  si la personne marche jusqu'à l'ascenseur, elle l'appellera lorsqu'elle sera bien positionnée
+    //  si la personne marche vers le couloir, elle ira se cacher au fond
     @Override
     void walk() {
         switch (movement) {
-            case TOELEVATOR:
-                position.setPlace(position.getPlace() + 1);
-                try {
-                    callElevator();
-                } catch (MikolivatorException e) {
-//            System.out.println(e.getMessage());
-                }
+            case TOELEVATOR:    //  marcher vers l'ascenseur
+                position.setPlace(position.getPlace() + 1); //  modifier la position de la personne
+                callElevator(); //  tenter d'appeler l'ascenseur (n'aura aucune incidence si la personne n'est pas devant)
+                notifyObs(position.getFloor()); //  notifier un changement au niveau de l'étage
                 break;
-            case TOCORRIDOR:
-                if (isHidden) return;
-                position.setPlace(position.getPlace() - 1);
-                if(position.getPlace() == -1) {
-                    isHidden = true;
-                    notifyObs(position.getFloor());
+            case TOCORRIDOR:    //  marcher vers le couloir
+                if (isHidden) return;   //  si on est caché, ne rien faire
+                position.setPlace(position.getPlace() - 1); //  modifier la position de la personne
+                if(position.getPlace() == -1) { //  si on a atteint la position "cachée"
+                    isHidden = true;    //  indiquer que la personne est cachée                    
                 }
+                notifyObs(position.getFloor()); //  notifier un changement au niveau de l'étage
                 break;
         }
-
-//        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
     }
 
+    //  contenu du thread de la personne (marcher si possible)
     @Override
     public void run() {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!isInElevator && !isWaiting) {
+                if (!isInElevator && !isWaiting) {  //  vérifier si la personne n'est pas dans l'ascenseur ou en train d'attendre un ascenseur
                     walk();
                 }
             }
         }, new Date(), 1000);
     }
 
+    //  ----------------- METHODES CONCERNANT LES OBSERVATEURS
+    
     @Override
     public void addObserver(Observer obs) {
         if (!observers.contains(obs)) {
