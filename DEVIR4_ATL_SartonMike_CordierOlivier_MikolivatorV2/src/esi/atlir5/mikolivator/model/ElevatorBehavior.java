@@ -25,12 +25,8 @@ abstract class ElevatorBehavior {
     }
 
     //  ajoute une destination en vérifiant qu'elle n'est pas déjà présente
-    private void addDestination(int floor) throws MikolivatorException {
-        if (floor > elevator.getLastFloor() || floor < elevator.getLowestFloor()) {
-            throw new MikolivatorException("Etage inexistant");
-        }
-
-        if (destinations.contains(floor)) {
+    void addDestination(int floor) {
+        if (destinations.contains(floor) || elevator.getCurrentFloor() == floor) {
             return;
         }
         destinations.add(floor);
@@ -79,8 +75,8 @@ abstract class ElevatorBehavior {
         //  bloquer le thread courant le temps que l'ascenseur monte
         try {
             Thread.sleep(sleepTime * 1000);
+            elevator.setMovement(MovementElevator.STANDBY);
             int nb = releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
-            System.out.println("Etage : " + elevator.getCurrentFloor() + " > " + nb + " passager(s) sont libérés.");
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingUp(): "
                     + ex.getMessage());
@@ -112,8 +108,8 @@ abstract class ElevatorBehavior {
         //  bloquer le thread courant le temps que l'ascenseur descend
         try {
             Thread.sleep(sleepTime * 1000);
+            elevator.setMovement(MovementElevator.STANDBY);
             int nb = releasePassenger(elevator.getCurrentFloor());  //  faire sortir les personnes de l'ascenseur
-            System.out.println("Etage : " + elevator.getCurrentFloor() + " > " + nb + " passager(s) sont libérés.");
         } catch (InterruptedException ex) {
             System.out.println("Erreur - ControllerElevator - goingDown(): "
                     + ex.getMessage());
@@ -125,15 +121,15 @@ abstract class ElevatorBehavior {
         if (!elevator.isFreePlace()) { //  vérifie s'il reste de la place
             return false;
         }
-        try {
+//        try {
             addDestination(p.getDestinationFloor());    //  ajoute la destinationr
             p.enterElevator(elevatorPosition);    //  faire entrer le passager dans l'ascenseur et le positionner dans l'ascenseur
             passengers.add(p);  //  ajoute la personne à la liste des passagers
             elevator.addOnePerson();    //  augmente le nombre de personnes dans l'ascenseur
-        } catch (MikolivatorException ex) {
-            System.out.println(ex.getMessage());
-            return false;
-        }
+//        } catch (MikolivatorException ex) {
+//            System.out.println(ex.getMessage());
+//            return false;
+//        }
         return true;    //  retourne vrai si la personne a bien été ajoutée.
     }
 
@@ -149,12 +145,12 @@ abstract class ElevatorBehavior {
                 elevator.releaseOnePerson();    //  diminue le nombre de personnes dans l'ascenseur
                 index = 0;    //  recommencer au début de la liste de passager
                 ++cpt;  //  incrémenter le nombre de passagers libérés
-                System.out.println("1 personne est sortie de l'ascenseur.");
             } else {
                 ++index;   //   passer à la personne suivante
             }
         }
 
+        System.out.println(cpt + " personnes sont sorties de l'ascenseur.");
         return cpt;
     }
 

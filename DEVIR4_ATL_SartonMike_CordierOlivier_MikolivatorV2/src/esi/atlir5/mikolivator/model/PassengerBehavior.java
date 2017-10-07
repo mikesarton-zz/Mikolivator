@@ -12,6 +12,7 @@ abstract class PassengerBehavior {
     Position position;
     boolean isInElevator;
     boolean isWaiting;
+    boolean isHidden;
     MovementPassenger movement;
     private final List<Integer> elevatorsPositions;
 
@@ -47,7 +48,15 @@ abstract class PassengerBehavior {
     void setPosition(Position position) {
         this.position = position;
     }
-        
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public void setIsHidden(boolean isHidden) {
+        this.isHidden = isHidden;
+    }
+            
     boolean isGoingUp(){
         return destinationFloor > position.getFloor();
     }
@@ -70,8 +79,6 @@ abstract class PassengerBehavior {
         if (!wellPlaced) {
             throw new MikolivatorException("Impossible d'appeler l'ascenseur "
                 + "si on est pas devant.");
-        } else {
-            System.out.println("Le passager attend l'ascenseur.");
         }
         
         isWaiting = true;
@@ -80,9 +87,11 @@ abstract class PassengerBehavior {
     void enterElevator(int placeElevator) {
         position.setPlace(placeElevator);
         isInElevator = true;
+        isWaiting = false;
     }
 
     void leaveElevator(int placeElevator) {
+        position.setFloor(destinationFloor);
         position.setPlace(placeElevator);
         isInElevator = false;
         movement = MovementPassenger.TOCORRIDOR;

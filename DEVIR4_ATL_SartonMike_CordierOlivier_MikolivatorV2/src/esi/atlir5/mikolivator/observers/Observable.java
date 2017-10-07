@@ -23,5 +23,5 @@ public interface Observable {
      * This method calls the udpate() method of each observer of the
      * observable's list.
      */
-    public void notifyObs();
+    public void notifyObs(int i);
 }

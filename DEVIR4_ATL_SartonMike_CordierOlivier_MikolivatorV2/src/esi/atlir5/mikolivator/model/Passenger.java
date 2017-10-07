@@ -9,29 +9,31 @@ import java.util.TimerTask;
  *
  * @author Mike Sarton & Olivier Cordier
  */
-class Passenger extends PassengerBehavior implements Runnable{
-    
-    
-    Passenger (int destination, List<Integer> elevators_positions) {
-        super (destination, elevators_positions);
+class Passenger extends PassengerBehavior implements Runnable {
+
+    Passenger(int destination, List<Integer> elevators_positions) {
+        super(destination, elevators_positions);
     }
 
     @Override
     void walk() {
         switch (movement) {
-            case TOELEVATOR : position.setPlace(position.getPlace() + 1);
-                break;
-            case TOCORRIDOR : position.setPlace(position.getPlace() - 1);
-                break;
-        }
-        
-        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
-        
-        try {
-            callElevator();
-        } catch (MikolivatorException e) {
+            case TOELEVATOR:
+                position.setPlace(position.getPlace() + 1);
+                try {
+                    callElevator();
+                } catch (MikolivatorException e) {
 //            System.out.println(e.getMessage());
+                }
+                break;
+            case TOCORRIDOR:
+                if (isHidden) return;
+                position.setPlace(position.getPlace() - 1);
+                isHidden = position.getPlace() == -1;
+                break;
         }
+
+        System.out.println("Etage: " + position.getFloor() + " Position: " + position.getPlace() + " Destination: " + getDestinationFloor());
     }
 
     @Override
@@ -46,5 +48,4 @@ class Passenger extends PassengerBehavior implements Runnable{
         }, new Date(), 1000);
     }
 
-    
 }

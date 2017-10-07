@@ -4,19 +4,31 @@ package esi.atlir5.mikolivator.model;
  *
  * @author Mike Sarton & Olivier Cordier
  */
-class ControllerElevator extends ElevatorBehavior {
+class ControllerElevator extends ElevatorBehavior implements Runnable {
+    
+    boolean isRunning;
 
     ControllerElevator(int nb_persons_max, int current_floor, int last_floor,
             int lowest_floor, int elevator_position) {
         super(new Elevator(nb_persons_max, current_floor, last_floor,
                 lowest_floor), elevator_position);
+        
+        isRunning = true;
     }
 
+    @Override
+    public void run() {
+        while (isRunning) {
+            move();            
+        }
+    }
+    
     //  déplace l'ascenseur (reste à définir l'algo qu'on veut)
     @Override
     public void move() {
         //  tant qu'il reste des destinations...
         while (!destinations.isEmpty()) {
+            System.out.println("Départ de l'ascenseur...");
             //  prendre la première qui a été entrée
             int destination = destinations.remove(0);
 
@@ -62,5 +74,4 @@ class ControllerElevator extends ElevatorBehavior {
 //        ce.addPassenger(p11);
 //        ce.move();
     }
-
 }

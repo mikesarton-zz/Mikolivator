@@ -32,6 +32,8 @@ public class Simulation extends Thread implements Observable {
 //        building = new Building(nb_persons_max_in_building);
         ctrlElevator = new ControllerElevator(nb_persons_max_in_elevator, 0, 
                 number_of_floors, 0, 11);
+        Thread thread = new Thread (ctrlElevator);  //  à retirer si comportement suspect.
+        thread.start();
         minInterval = min_interval_generate_passengers;
         maxInterval = max_interval_generate_passengers;
         observers = new ArrayList<>();
@@ -61,21 +63,23 @@ public class Simulation extends Thread implements Observable {
             }
         }, delay);
         addPerson(new Passenger(Functions.randomNumber(
-                ctrlElevator.getLowestFloor(), ctrlElevator.getLastFloor()), elevatorsPositions));
+                ctrlElevator.getLowestFloor()+1, ctrlElevator.getLastFloor()), elevatorsPositions));
     }
     
-    private void addPerson (Passenger p) {
+    private synchronized void addPerson (Passenger p) {
         if (people.size() == nbPersonsMax) return;
         people.add(p);
         Thread thread = new Thread (p);
         thread.start();
-        notifyObs();
+//        notifyObs();
     }
     
-    private void lookForWaitingPeople() {
+    private synchronized void lookForWaitingPeople() {
         people.stream().filter((p) -> (p.isWaiting() && !waitingPeople.contains(p))).forEachOrdered((p) -> {
             addPersonWaiting(p);
-            notifyObs();
+            System.out.println(waitingPeople.size() + " personnes attendent l'ascenseur.");
+            ctrlElevator.addDestination(p.getPosition().getFloor());
+//            notifyObs();
         });
     }
     
@@ -88,7 +92,6 @@ public class Simulation extends Thread implements Observable {
         while (index < waitingPeople.size()) {
             if (waitingPeople.get(index).getPosition().getFloor() == ctrlElevator.getCurrentFloor()) {
                 if (!ctrlElevator.addPassenger(waitingPeople.get(index))) {
-                    System.out.println(cpt + " personnes sont montées dans l'ascenseur.");
                     System.out.println("L'ascenseur est complet... départ");
                     ctrlElevator.move();
                     return;
@@ -102,7 +105,6 @@ public class Simulation extends Thread implements Observable {
             }
         }
         System.out.println(cpt + " personnes sont montées dans l'ascenseur.");
-        System.out.println("Départ de l'ascenseur...");
         ctrlElevator.move();
     }
     
@@ -133,9 +135,9 @@ public class Simulation extends Thread implements Observable {
     }
 
     @Override
-    public void notifyObs() {
+    public void notifyObs(int view) {
         observers.forEach((obs) -> {
-            obs.update();
+            obs.update(view);
         });
     }
 }
