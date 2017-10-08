@@ -31,7 +31,7 @@ abstract class ElevatorBehavior implements Observable {
 
     //  ajouter une destination à l'ascenseur
     void addDestination(int floor) {
-        if (destinations.contains(floor) || elevator.getCurrentFloor() == floor) {  //  vérifie qu'elle n'est pas déjà présente OU étage courant de l'ascenseur
+        if (destinations.contains(floor)/* || elevator.getCurrentFloor() == floor*/) {  //  vérifie qu'elle n'est pas déjà présente OU étage courant de l'ascenseur
             return;
         }
         destinations.add(floor);
@@ -55,6 +55,11 @@ abstract class ElevatorBehavior implements Observable {
     //  retourner le mouvement de l'ascenseur
     MovementElevator getMovement() {
         return elevator.getMovement();
+    }
+    
+    //  retourner la liste des destinations
+    List<Integer> getDestinations() {
+        return new ArrayList<>(destinations);
     }
 
     //  monter l'ascenseur jusqu'à la destination

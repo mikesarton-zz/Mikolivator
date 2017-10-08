@@ -92,13 +92,24 @@ public class Simulation extends Thread implements Observable {
     
     //  vérifier si des gens attendent un ascenseur, si oui, les ajouter à la liste correspondante et prévenir l'ascenseur
     private synchronized void lookForWaitingPeople() {
-        people.stream().filter((p) -> (p.isWaiting() && !waitingPeople.contains(p))).forEachOrdered((p) -> {
-            addPersonWaiting(p);    //  ajouter la personne à la liste des personnes qui attendent
-            ctrlElevator.addDestination(p.getPosition().getFloor());    //  prévenir l'ascenseur d'aller chercher la personne
-            notifyObs(p.getPosition().getFloor());  //  notifier un changement au niveau de l'étage
+//        people.stream().filter((p) -> (p.isWaiting() && !waitingPeople.contains(p))).forEachOrdered((p) -> {
+//            addPersonWaiting(p);    //  ajouter la personne à la liste des personnes qui attendent
+//            ctrlElevator.addDestination(p.getPosition().getFloor());    //  prévenir l'ascenseur d'aller chercher la personne
+//            notifyObs(p.getPosition().getFloor());  //  notifier un changement au niveau de l'étage
+//        });
+        people.forEach((p) -> {
+            if (p.isWaiting() && !waitingPeople.contains(p)) {
+                addPersonWaiting(p);    //  ajouter la personne à la liste des personnes qui attendent
+                ctrlElevator.addDestination(p.getPosition().getFloor());    //  prévenir l'ascenseur d'aller chercher la personne
+                notifyObs(p.getPosition().getFloor());  //  notifier un changement au niveau de l'étage
+            } else if (p.isWaiting()) {
+                if (!ctrlElevator.getDestinations().contains(p.getPosition().getFloor())) {
+                    ctrlElevator.addDestination(p.getPosition().getFloor());
+                }
+            }
         });
     }
-    
+
     //  faire entrer dans l'ascenseur les gens qui attendent et se trouvant à l'étage courant de l'ascenseur
     private void enterPeople() {
         if (waitingPeople.isEmpty() || (ctrlElevator.getMovement() != MovementElevator.STANDBY)) return;
@@ -176,6 +187,15 @@ public class Simulation extends Thread implements Observable {
         int cpt = 0;
         for (Passenger p : people) {
             if ((p.getPosition().getFloor() == floor) && (p.isHidden())) ++cpt;
+        }
+        return cpt;
+    }
+    
+    //  temporaire, pour du Debug
+    public int getNumberPassengerWhoReachedTheirGoal() {
+        int cpt = 0;
+        for (Passenger p : people) {
+            if (p.getPosition().getFloor() == p.getDestinationFloor()) ++cpt;
         }
         return cpt;
     }

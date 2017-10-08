@@ -39,7 +39,7 @@ class ControllerElevator extends ElevatorBehavior implements Runnable {
             if (destination > elevator.getCurrentFloor()) { //  monter ou descendre selon où l'ascenseur se situe
                 goingUp(destination);   //  monter l'ascenseur jusqu'à la destination "destination"
                 notifyObs(104); //  notifier un changement au niveau du bâtiment
-            } else {
+            } else if (destination < elevator.getCurrentFloor()){
                 goingDown(destination); //  descendre l'ascenseur jusqu'à la destination "destination"
                 notifyObs(104); //  notifier un changement au niveau du bâtiment
             }
