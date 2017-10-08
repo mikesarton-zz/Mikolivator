@@ -92,17 +92,12 @@ public class Simulation extends Thread implements Observable {
     
     //  vérifier si des gens attendent un ascenseur, si oui, les ajouter à la liste correspondante et prévenir l'ascenseur
     private synchronized void lookForWaitingPeople() {
-//        people.stream().filter((p) -> (p.isWaiting() && !waitingPeople.contains(p))).forEachOrdered((p) -> {
-//            addPersonWaiting(p);    //  ajouter la personne à la liste des personnes qui attendent
-//            ctrlElevator.addDestination(p.getPosition().getFloor());    //  prévenir l'ascenseur d'aller chercher la personne
-//            notifyObs(p.getPosition().getFloor());  //  notifier un changement au niveau de l'étage
-//        });
         people.forEach((p) -> {
             if (p.isWaiting() && !waitingPeople.contains(p)) {
                 addPersonWaiting(p);    //  ajouter la personne à la liste des personnes qui attendent
                 ctrlElevator.addDestination(p.getPosition().getFloor());    //  prévenir l'ascenseur d'aller chercher la personne
                 notifyObs(p.getPosition().getFloor());  //  notifier un changement au niveau de l'étage
-            } else if (p.isWaiting()) {
+            } else if (p.isWaiting()) { //  si la personne attendait déjà mais que son étage n'est plus dans les destinations de l'ascenseur
                 if (!ctrlElevator.getDestinations().contains(p.getPosition().getFloor())) {
                     ctrlElevator.addDestination(p.getPosition().getFloor());
                 }
