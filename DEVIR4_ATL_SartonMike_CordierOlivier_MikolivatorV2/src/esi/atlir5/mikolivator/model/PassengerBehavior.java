@@ -4,6 +4,8 @@ import esi.atlir5.mikolivator.observers.Observable;
 import esi.atlir5.mikolivator.observers.Observer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -62,9 +64,16 @@ abstract class PassengerBehavior implements Observable {
     
     //  ------------- TOUS LES SETTERS
 
-    //  modifie la destination de la personne
+    //  modifie la destination de la personne (quand il est caché)
     void setDestinationFloor(int destinationFloor) {
-        this.destinationFloor = destinationFloor;
+        try {
+            Thread.sleep(5000); //  attendre 5 secondes... pour qu'il soit pas caché pour rien
+            this.destinationFloor = destinationFloor;   //  recevoir une nouvelle destination
+            isHidden = false;   //  la personne n'est plus cachée
+            movement = MovementPassenger.TOELEVATOR;    //  direction l'ascenseur
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PassengerBehavior.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //  modifie le sens de marche de la personne (vérifié si utilisé + tard)

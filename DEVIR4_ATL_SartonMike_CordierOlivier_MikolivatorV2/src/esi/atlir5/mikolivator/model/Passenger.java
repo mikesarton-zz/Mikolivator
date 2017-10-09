@@ -31,7 +31,6 @@ class Passenger extends PassengerBehavior implements Runnable {
                 notifyObs(position.getFloor()); //  notifier un changement au niveau de l'étage
                 break;
             case TOCORRIDOR:    //  marcher vers le couloir
-                if (isHidden) return;   //  si on est caché, ne rien faire
                 position.setPlace(position.getPlace() - 1); //  modifier la position de la personne
                 if(position.getPlace() == -1) { //  si on a atteint la position "cachée"
                     isHidden = true;    //  indiquer que la personne est cachée                    
@@ -47,8 +46,9 @@ class Passenger extends PassengerBehavior implements Runnable {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!isInElevator && !isWaiting) {  //  vérifier si la personne n'est pas dans l'ascenseur ou en train d'attendre un ascenseur
+                if (!isInElevator && !isWaiting && !isHidden) {  //  vérifier si la personne n'est pas dans l'ascenseur ou en train d'attendre un ascenseur ou n'est pas caché
                     walk();
+//                    System.out.println("Etage: " + position.getFloor() + ", place: " + position.getPlace() + ", destination: " + getDestinationFloor());
                 }
             }
         }, new Date(), 1000);

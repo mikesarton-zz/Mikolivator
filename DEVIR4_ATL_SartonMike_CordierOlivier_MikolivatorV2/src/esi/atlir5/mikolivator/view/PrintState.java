@@ -18,7 +18,7 @@ public class PrintState implements Observer {
         List<Integer> elevatorsPositions = new ArrayList<>();
         elevatorsPositions.add(11);
         try {
-            simulation = new Simulation(50, 1, 10, 3, 5, elevatorsPositions, this);
+            simulation = new Simulation(50, 5, 10, 3, 5, elevatorsPositions, this);
             simulation.addObserver(this);
         } catch (MikolivatorException e) {
             System.out.println(e.getMessage());
@@ -30,7 +30,7 @@ public class PrintState implements Observer {
     public void update(int view) {
         switch (view) {
             case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
-                printFloor(view);
+//                printFloor(view);
                 break;
             case 101:
                 printElevator();
@@ -42,7 +42,7 @@ public class PrintState implements Observer {
                 System.out.println("Update ascenseur 3.");
                 break;
             case 104:
-                printBuilding();
+//                printBuilding();
                 break;
         }
     }
@@ -51,7 +51,6 @@ public class PrintState implements Observer {
         System.out.println("------- Building -------");
         System.out.println(simulation.getNumberOfPeople() + " personnes dans le bâtiment.");
         System.out.println(simulation.getNumberOfWaitingPeople() + " attendent un ascenseur.");
-        System.out.println(simulation.getNumberPassengerWhoReachedTheirGoal() + " personnes ont atteint leur étage");
     }
     
     public void printElevator() {
