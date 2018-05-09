@@ -62,3 +62,10 @@ Une fois le projet ouvert dans Netbeans:
 7.  Une fois la base de donnée connectée, prendre le schéma `Mikoli` par défaut. Pour ce faire, dérouler tous les schémas générés automatiquement par défaut, clique droit sur Mikoli > "Selectionner comme schéma par défaut".
 
 Une fois que la base de donnée a été mise en place, la simulation permettra dès lors de sauvegarder l'historique des simulations. Les informations concernant ces historiques seront accessibles dans l'application via le menu "Database".
+
+## Illustrations
+![](pictures/start.png)
+![](pictures/config.png)
+![](pictures/simulation.png)
+![](pictures/realTimeInfos2.png)
+![](pictures/realTimeinfo.png)
