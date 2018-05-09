@@ -68,4 +68,4 @@ Une fois que la base de donnée a été mise en place, la simulation permettra d
 ![](pictures/config.png)
 ![](pictures/simulation.png)
 ![](pictures/realTimeInfos2.png)
-![](pictures/realTimeinfo.png)
+![](pictures/realTimeInfo.png)
