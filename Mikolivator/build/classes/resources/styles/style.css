@@ -1,0 +1,71 @@
+.floor-grid {
+    -fx-background-color: black ;
+    -fx-padding: 0 ;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+}
+.floor {
+    -fx-background-color: black ;
+    -fx-padding: 3 3 4 3;  
+}
+.main {
+    -fx-background-color: black ;
+}
+.intro{
+    -fx-background-image: url("../mikoliVator.gif");
+    -fx-background-repeat: stretch;   
+    -fx-background-size: 600 400;
+    -fx-background-position: center center;
+    -fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0); 
+}
+.v{
+    -fx-background-image: url("../v.gif");
+}
+.labelGrid{
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+.tableView{
+    -fx-background-image: url("../backGround.jpg");
+    -fx-background-repeat: repeat;
+}
+.border{
+    -fx-background-image: url("../backGround.jpg");
+    -fx-background-repeat: repeat;
+
+    -fx-padding: 0 ;
+    -fx-padding: 10;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-insets: 5; 
+    -fx-border-radius: 5; 
+    -fx-border-color: black;
+    -fx-grid-lines-visible: true
+
+}
+.border Line{
+    -fx-stroke   : black;
+
+}
+.titleTableView{
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+}
+.title2TableView{
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+}
+
+.chart{
+    -fx-background-image: url("../backGround.jpg");
+    -fx-background-repeat: repeat;
+}
+
+#my-table .table-cell {
+    -fx-alignment: CENTER;
+
+}

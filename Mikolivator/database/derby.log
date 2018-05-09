@@ -1,0 +1,20 @@
+Sat Dec 09 14:34:48 CET 2017 : Apache Derby Network Server - 10.13.1.1 - (Unversioned directory) démarré et prêt à accepter les connexions sur le port 1527
+----------------------------------------------------------------
+Sat Dec 09 14:34:48 CET 2017:
+Amorçage de Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (Unversioned directory) : instance a816c00e-0160-3b7c-44f5-ffff81c70e4c 
+dans le répertoire de base de données /Users/Liongeek/Desktop/Mikolivator V15/ATLIR5_ATL_SartonMike_CordierOlivier_Mikolivator/database/MikolivatorDB avec le chargeur de classe sun.misc.Launcher$AppClassLoader@6f94fa3e
+Chargé de file:/Applications/NetBeans/glassfish-4.1.1/javadb/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_151-b12
+user.dir=/Applications/NetBeans/glassfish-4.1.1/javadb
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.13
+derby.system.home=/Users/Liongeek/Desktop/Mikolivator V15/ATLIR5_ATL_SartonMike_CordierOlivier_Mikolivator/database
+Chargeur de classe de la base de données démarré - derby.database.classpath = ''
+----------------------------------------------------------------
+Sun Dec 10 19:16:31 CET 2017 : fermeture du moteur Derby
+----------------------------------------------------------------
+Sun Dec 10 19:16:31 CET 2017:
+Fermeture de l'instance a816c00e-0160-3b7c-44f5-ffff81c70e4c sur le répertoire de base de données /Users/Liongeek/Desktop/Mikolivator V15/ATLIR5_ATL_SartonMike_CordierOlivier_Mikolivator/database/MikolivatorDB avec le chargeur de classe sun.misc.Launcher$AppClassLoader@6f94fa3e 
+----------------------------------------------------------------
